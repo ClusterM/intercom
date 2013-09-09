@@ -13,8 +13,8 @@
 #include "transfer.h"
 
 
-volatile unsigned char mode_current = 1; // Текущий режим
-volatile unsigned char mode_temp = 0;    // Режим на один раз
+volatile unsigned char mode_current = 1; // РўРµРєСѓС‰РёР№ СЂРµР¶РёРј
+volatile unsigned char mode_temp = 0;    // Р РµР¶РёРј РЅР° РѕРґРёРЅ СЂР°Р·
 volatile unsigned long int record_num = 0;
 char buffer[32];
 
@@ -43,41 +43,41 @@ void send_current_mode(unsigned char dest)
 {
 	buffer[0] = mode_current;
 	buffer[1] = mode_temp;
-	clunet_send(dest, CLUNET_PRIORITY_INFO, CLUNET_COMMAND_INTERCOM_MODE_INFO, (char*)&buffer, 2); // Отправляем в сеть текущий режим
+	clunet_send(dest, CLUNET_PRIORITY_INFO, CLUNET_COMMAND_INTERCOM_MODE_INFO, (char*)&buffer, 2); // РћС‚РїСЂР°РІР»СЏРµРј РІ СЃРµС‚СЊ С‚РµРєСѓС‰РёР№ СЂРµР¶РёРј
 }
 
 void save_mode()
 {
-	eeprom_write_byte((void*)4, mode_current); // Режим 
-	eeprom_write_byte((void*)5, mode_temp); // Временный режим
+	eeprom_write_byte((void*)4, mode_current); // Р РµР¶РёРј 
+	eeprom_write_byte((void*)5, mode_temp); // Р’СЂРµРјРµРЅРЅС‹Р№ СЂРµР¶РёРј
 	send_current_mode(CLUNET_BROADCAST_ADDRESS);
 }
 
 void data_received(unsigned char src_address, unsigned char dst_address, unsigned char command, char* data, unsigned char size)
 {
-	if (command == CLUNET_COMMAND_TIME && size >= 6) // Синхронизация времени
+	if (command == CLUNET_COMMAND_TIME && size >= 6) // РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РІСЂРµРјРµРЅРё
 	{
 		set_time(data[3]+2000, data[4], data[5], data[0],data[1],data[2]);
 	}
-	else if (command == CLUNET_COMMAND_INTERCOM_MODE_REQUEST) // У нас запрашивают режим
+	else if (command == CLUNET_COMMAND_INTERCOM_MODE_REQUEST) // РЈ РЅР°СЃ Р·Р°РїСЂР°С€РёРІР°СЋС‚ СЂРµР¶РёРј
 	{
 		send_current_mode(src_address);
 	}
-	else if (command == CLUNET_COMMAND_INTERCOM_MODE_SET) // Установка режима
+	else if (command == CLUNET_COMMAND_INTERCOM_MODE_SET) // РЈСЃС‚Р°РЅРѕРІРєР° СЂРµР¶РёРјР°
 	{
 		if (size >= 1 && (unsigned char)data[0] != 0xFF) mode_current = data[0];
 		if (size >= 2 && (unsigned char)data[1] != 0xFF) mode_temp = data[1];
 		save_mode();
 	}	
-	else if (command == CLUNET_COMMAND_INTERCOM_RECORD_REQUEST) // Передача записей
+	else if (command == CLUNET_COMMAND_INTERCOM_RECORD_REQUEST) // РџРµСЂРµРґР°С‡Р° Р·Р°РїРёСЃРµР№
 	{
-		if (size == 4) transfer_start(*((unsigned long int*)data), src_address); // Начинаем передачу
-		else if (size == 1 && data[0] == 1) transfer_ack(); // Подтвержают приём, переходим к следующему куску
-		else if (size == 1 && data[0] == 0) transfer_stop(); // Прекращение передачи данных
+		if (size == 4) transfer_start(*((unsigned long int*)data), src_address); // РќР°С‡РёРЅР°РµРј РїРµСЂРµРґР°С‡Сѓ
+		else if (size == 1 && data[0] == 1) transfer_ack(); // РџРѕРґС‚РІРµСЂР¶Р°СЋС‚ РїСЂРёС‘Рј, РїРµСЂРµС…РѕРґРёРј Рє СЃР»РµРґСѓСЋС‰РµРјСѓ РєСѓСЃРєСѓ
+		else if (size == 1 && data[0] == 0) transfer_stop(); // РџСЂРµРєСЂР°С‰РµРЅРёРµ РїРµСЂРµРґР°С‡Рё РґР°РЅРЅС‹С…
 	}
 }
 
-int is_LINE_POWER() // Определяет, что есть стабильный сигнал в линии
+int is_LINE_POWER() // РћРїСЂРµРґРµР»СЏРµС‚, С‡С‚Рѕ РµСЃС‚СЊ СЃС‚Р°Р±РёР»СЊРЅС‹Р№ СЃРёРіРЅР°Р» РІ Р»РёРЅРёРё
 {
 	int i;	
 	for (i = 0; i < 10; i++)
@@ -88,7 +88,7 @@ int is_LINE_POWER() // Определяет, что есть стабильный сигнал в линии
 	return 1;
 }
 
-void intercom_bell() // Издаёт звук входящего звонка
+void intercom_bell() // РР·РґР°С‘С‚ Р·РІСѓРє РІС…РѕРґСЏС‰РµРіРѕ Р·РІРѕРЅРєР°
 {
 	int t;
 	for (t = 0; t < 9; t++)
@@ -101,7 +101,7 @@ void intercom_bell() // Издаёт звук входящего звонка
 	}
 }
 
-int answer_play(char* filename) // Отвечает и воспроизводит файл
+int answer_play(char* filename) // РћС‚РІРµС‡Р°РµС‚ Рё РІРѕСЃРїСЂРѕРёР·РІРѕРґРёС‚ С„Р°Р№Р»
 {
 	ANSWER;
 	MODE_MYSOUND;
@@ -110,7 +110,7 @@ int answer_play(char* filename) // Отвечает и воспроизводит файл
 	{
 		while (sound_read() >= 0)
 		{
-			if (!LINE_POWER || OFFHOOK) // Сняли трубку, или сигнал исчез
+			if (!LINE_POWER || OFFHOOK) // РЎРЅСЏР»Рё С‚СЂСѓР±РєСѓ, РёР»Рё СЃРёРіРЅР°Р» РёСЃС‡РµР·
 			{
 				sound_stop();
 				return 1;
@@ -121,23 +121,23 @@ int answer_play(char* filename) // Отвечает и воспроизводит файл
 	return 0;
 }
 
-int answer_play_open(char* filename) // Отвечает, воспроизводит файл и открывает дверь
+int answer_play_open(char* filename) // РћС‚РІРµС‡Р°РµС‚, РІРѕСЃРїСЂРѕРёР·РІРѕРґРёС‚ С„Р°Р№Р» Рё РѕС‚РєСЂС‹РІР°РµС‚ РґРІРµСЂСЊ
 {
-	if (answer_play(filename)) return 1; // Сняли трубку, или сигнал исчез
+	if (answer_play(filename)) return 1; // РЎРЅСЏР»Рё С‚СЂСѓР±РєСѓ, РёР»Рё СЃРёРіРЅР°Р» РёСЃС‡РµР·
 	OPEN;
 	return 0;
 }
 
 
-int answer_record(char* filename1, char* filename2) // Отвечает, записывает сообщение,
+int answer_record(char* filename1, char* filename2) // РћС‚РІРµС‡Р°РµС‚, Р·Р°РїРёСЃС‹РІР°РµС‚ СЃРѕРѕР±С‰РµРЅРёРµ,
 {
-	if (answer_play(filename1)) return 1; // Отвечаем, предлагаем оставить сообщение
-	beep(3000, 500);	// Биип
-	sprintf(buffer, "/%08lu.wav", record_num); // Формируем имя файла
-	clunet_send(CLUNET_BROADCAST_ADDRESS, CLUNET_PRIORITY_INFO, CLUNET_COMMAND_INTERCOM_MESSAGE, (char*)&record_num, sizeof(record_num)); // Отправляем в сеть сообщение
+	if (answer_play(filename1)) return 1; // РћС‚РІРµС‡Р°РµРј, РїСЂРµРґР»Р°РіР°РµРј РѕСЃС‚Р°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ
+	beep(3000, 500);	// Р‘РёРёРї
+	sprintf(buffer, "/%08lu.wav", record_num); // Р¤РѕСЂРјРёСЂСѓРµРј РёРјСЏ С„Р°Р№Р»Р°
+	clunet_send(CLUNET_BROADCAST_ADDRESS, CLUNET_PRIORITY_INFO, CLUNET_COMMAND_INTERCOM_MESSAGE, (char*)&record_num, sizeof(record_num)); // РћС‚РїСЂР°РІР»СЏРµРј РІ СЃРµС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ
 	record_num++;
-	eeprom_write_dword((void*)0, record_num); // Запоминаем кол-во записей
-	if (rec_wav(buffer) == 0) // Пишем сообщение
+	eeprom_write_dword((void*)0, record_num); // Р—Р°РїРѕРјРёРЅР°РµРј РєРѕР»-РІРѕ Р·Р°РїРёСЃРµР№
+	if (rec_wav(buffer) == 0) // РџРёС€РµРј СЃРѕРѕР±С‰РµРЅРёРµ
 	{
 		int s = 0;
 		long int totalSize = 0;
@@ -145,7 +145,7 @@ int answer_record(char* filename1, char* filename2) // Отвечает, записывает сооб
 		{
 			s = sound_write();
 			totalSize += s;
-			if (!LINE_POWER || OFFHOOK) // Сняли трубку, или сигнал исчез
+			if (!LINE_POWER || OFFHOOK) // РЎРЅСЏР»Рё С‚СЂСѓР±РєСѓ, РёР»Рё СЃРёРіРЅР°Р» РёСЃС‡РµР·
 			{
 				sound_stop();
 				return 1;
@@ -153,11 +153,11 @@ int answer_record(char* filename1, char* filename2) // Отвечает, записывает сооб
 		}
 		sound_stop();
 	}	
-	if (play_wav_pgm(filename2) == 0) // Если пациент дождался, благодарим
+	if (play_wav_pgm(filename2) == 0) // Р•СЃР»Рё РїР°С†РёРµРЅС‚ РґРѕР¶РґР°Р»СЃСЏ, Р±Р»Р°РіРѕРґР°СЂРёРј
 	{
 		while (sound_read() >= 0)
 		{
-			if (!LINE_POWER || OFFHOOK) // Сняли трубку, или сигнал исчез
+			if (!LINE_POWER || OFFHOOK) // РЎРЅСЏР»Рё С‚СЂСѓР±РєСѓ, РёР»Рё СЃРёРіРЅР°Р» РёСЃС‡РµР·
 			{
 				sound_stop();
 				return 1;
@@ -168,19 +168,19 @@ int answer_record(char* filename1, char* filename2) // Отвечает, записывает сооб
 	return 0;
 }
 
-void incoming_ring() // Выполняется при любом входящем звонке
+void incoming_ring() // Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ РїСЂРё Р»СЋР±РѕРј РІС…РѕРґСЏС‰РµРј Р·РІРѕРЅРєРµ
 {
 	LED_RED_ON;	
-	unsigned char mode = (mode_temp != 0) ? mode_temp : mode_current; // Текущий режим
-	// Сообщение о звонке, указываем текущий режим
+	unsigned char mode = (mode_temp != 0) ? mode_temp : mode_current; // РўРµРєСѓС‰РёР№ СЂРµР¶РёРј
+	// РЎРѕРѕР±С‰РµРЅРёРµ Рѕ Р·РІРѕРЅРєРµ, СѓРєР°Р·С‹РІР°РµРј С‚РµРєСѓС‰РёР№ СЂРµР¶РёРј
 	clunet_send(CLUNET_BROADCAST_ADDRESS, CLUNET_PRIORITY_INFO, CLUNET_COMMAND_INTERCOM_RING, (char*)&mode, 1);
 	intercom_bell();
-	if (mode_temp) // Обнуляем временный режим
+	if (mode_temp) // РћР±РЅСѓР»СЏРµРј РІСЂРµРјРµРЅРЅС‹Р№ СЂРµР¶РёРј
 	{
 		mode_temp = 0;
 		save_mode();
 	}
-	if (!LINE_POWER) // Аварийное откртие двери, если набрали и сразу сбросили
+	if (!LINE_POWER) // РђРІР°СЂРёР№РЅРѕРµ РѕС‚РєСЂС‚РёРµ РґРІРµСЂРё, РµСЃР»Рё РЅР°Р±СЂР°Р»Рё Рё СЃСЂР°Р·Сѓ СЃР±СЂРѕСЃРёР»Рё
 	{
 		mode_temp = 0xFF; 
 		save_mode();
@@ -189,38 +189,38 @@ void incoming_ring() // Выполняется при любом входящем звонке
 	{
 		switch (mode)
 		{
-			case 1: // Автоответчик, долго ждёт ответа, потом записывает
+			case 1: // РђРІС‚РѕРѕС‚РІРµС‚С‡РёРє, РґРѕР»РіРѕ Р¶РґС‘С‚ РѕС‚РІРµС‚Р°, РїРѕС‚РѕРј Р·Р°РїРёСЃС‹РІР°РµС‚
 				answer_record(AUTOLONG_WAV, SAVED_WAV);
 				break;
-			case 2: // Автоответчик, сразу записывает
+			case 2: // РђРІС‚РѕРѕС‚РІРµС‚С‡РёРє, СЃСЂР°Р·Сѓ Р·Р°РїРёСЃС‹РІР°РµС‚
 				answer_record(AUTOFAST_WAV, SAVED_WAV);
 				break;
-			case 3: // Приветствует хозяина, открывает дверь
+			case 3: // РџСЂРёРІРµС‚СЃС‚РІСѓРµС‚ С…РѕР·СЏРёРЅР°, РѕС‚РєСЂС‹РІР°РµС‚ РґРІРµСЂСЊ
 				answer_play_open(OPENME_WAV);
 				break;
-			case 4: // Приветствует гостя, открывает дверь
+			case 4: // РџСЂРёРІРµС‚СЃС‚РІСѓРµС‚ РіРѕСЃС‚СЏ, РѕС‚РєСЂС‹РІР°РµС‚ РґРІРµСЂСЊ
 				answer_play_open(OPEN_WAV);
 				break;
-			case 5: // Долго ждёт ответа. Сообщение не пишет.
+			case 5: // Р”РѕР»РіРѕ Р¶РґС‘С‚ РѕС‚РІРµС‚Р°. РЎРѕРѕР±С‰РµРЅРёРµ РЅРµ РїРёС€РµС‚.
 				answer_play(WAITLONG_WAV);
 				break;
-			case 9: // Здрасти, здрастите. Проходи, братишка, проходи.
+			case 9: // Р—РґСЂР°СЃС‚Рё, Р·РґСЂР°СЃС‚РёС‚Рµ. РџСЂРѕС…РѕРґРё, Р±СЂР°С‚РёС€РєР°, РїСЂРѕС…РѕРґРё.
 				answer_play_open(MODE9_WAV);
 				break;				
-			case 0xFF:  // Аварийное откртие двери
+			case 0xFF:  // РђРІР°СЂРёР№РЅРѕРµ РѕС‚РєСЂС‚РёРµ РґРІРµСЂРё
 				answer_play_open(EMERGENCY_OPEN_WAV);
 		}
 		MODE_NORMAL;
-		_delay_ms(200); // На случай, если контакты снятия трубки не успели разомкнуться
+		_delay_ms(200); // РќР° СЃР»СѓС‡Р°Р№, РµСЃР»Рё РєРѕРЅС‚Р°РєС‚С‹ СЃРЅСЏС‚РёСЏ С‚СЂСѓР±РєРё РЅРµ СѓСЃРїРµР»Рё СЂР°Р·РѕРјРєРЅСѓС‚СЊСЃСЏ
 		HANGUP;
 	}
-	while (LINE_POWER); // Ждём пока не пропадёт сигнал 
+	while (LINE_POWER); // Р–РґС‘Рј РїРѕРєР° РЅРµ РїСЂРѕРїР°РґС‘С‚ СЃРёРіРЅР°Р» 
 	LED_RED_OFF;
-	while (OFFHOOK); // И пользователь не положит трубку
-	_delay_ms(100); // Защита от дребезга контактов
+	while (OFFHOOK); // Р РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ РїРѕР»РѕР¶РёС‚ С‚СЂСѓР±РєСѓ
+	_delay_ms(100); // Р—Р°С‰РёС‚Р° РѕС‚ РґСЂРµР±РµР·РіР° РєРѕРЅС‚Р°РєС‚РѕРІ
 }
 
-int count_disk() // Считает, что набрали на диске
+int count_disk() // РЎС‡РёС‚Р°РµС‚, С‡С‚Рѕ РЅР°Р±СЂР°Р»Рё РЅР° РґРёСЃРєРµ
 {
 	int cnt = 1;
 	while (1)
@@ -280,7 +280,7 @@ void say_mode(char istemp)
 	}
 }
 
-void select_mode(char istemp) // Выбот режима
+void select_mode(char istemp) // Р’С‹Р±РѕС‚ СЂРµР¶РёРјР°
 {
 	say_mode(istemp);
 	while (!CONTROL && OFFHOOK) play_wav_auto_pgm(MODELIST_WAV);
@@ -300,11 +300,11 @@ void select_mode(char istemp) // Выбот режима
 
 void play_record(long unsigned int num)
 {
-	sprintf(buffer, "/%08lu.wav", num); // Формируем имя файла
+	sprintf(buffer, "/%08lu.wav", num); // Р¤РѕСЂРјРёСЂСѓРµРј РёРјСЏ С„Р°Р№Р»Р°
 	play_wav_auto(buffer);
 }
 
-void control_mode() // Режим управления
+void control_mode() // Р РµР¶РёРј СѓРїСЂР°РІР»РµРЅРёСЏ
 {
 	LED_GREEN_ON;
 	while (OFFHOOK)
@@ -332,7 +332,7 @@ void control_mode() // Режим управления
 		}
 	}
 	LED_GREEN_OFF;
-	_delay_ms(100); // Защита от дребезга контактов
+	_delay_ms(100); // Р—Р°С‰РёС‚Р° РѕС‚ РґСЂРµР±РµР·РіР° РєРѕРЅС‚Р°РєС‚РѕРІ
 }
 
 int main (void)
@@ -342,19 +342,19 @@ int main (void)
 	time_init();
 	sei();
 	//eeprom_write_dword((void*)0, 0);
-	record_num = eeprom_read_dword((void*)0); // Читаем кол-во записей
-	mode_current = eeprom_read_byte((void*)4); // Режим 
-	mode_temp = eeprom_read_byte((void*)5); // Временный режим
+	record_num = eeprom_read_dword((void*)0); // Р§РёС‚Р°РµРј РєРѕР»-РІРѕ Р·Р°РїРёСЃРµР№
+	mode_current = eeprom_read_byte((void*)4); // Р РµР¶РёРј 
+	mode_temp = eeprom_read_byte((void*)5); // Р’СЂРµРјРµРЅРЅС‹Р№ СЂРµР¶РёРј
 
 	disk_initialize(0);	
 
-	unset_bit(DDRA, 3); set_bit(PORTA, 3);	 // Определение сигнала в линии	
-	unset_bit(DDRA, 4);	unset_bit(PORTA, 4); // Открывалка двери
-	set_bit(DDRA, 5); HANGUP; // Реле снимания трубки
-	set_bit(DDRA, 6); MODE_NORMAL; // Реле выбора режима
-	unset_bit(DDRG, 0); set_bit(PORTG, 0); // Определение, лежит ли трубка	
-	set_bit(DDRD, 6); set_bit(DDRD, 7); // Светодиоды
-	unset_bit(DDRA, 7); set_bit(PORTA, 7); // Счётчик оборотов диска
+	unset_bit(DDRA, 3); set_bit(PORTA, 3);	 // РћРїСЂРµРґРµР»РµРЅРёРµ СЃРёРіРЅР°Р»Р° РІ Р»РёРЅРёРё	
+	unset_bit(DDRA, 4);	unset_bit(PORTA, 4); // РћС‚РєСЂС‹РІР°Р»РєР° РґРІРµСЂРё
+	set_bit(DDRA, 5); HANGUP; // Р РµР»Рµ СЃРЅРёРјР°РЅРёСЏ С‚СЂСѓР±РєРё
+	set_bit(DDRA, 6); MODE_NORMAL; // Р РµР»Рµ РІС‹Р±РѕСЂР° СЂРµР¶РёРјР°
+	unset_bit(DDRG, 0); set_bit(PORTG, 0); // РћРїСЂРµРґРµР»РµРЅРёРµ, Р»РµР¶РёС‚ Р»Рё С‚СЂСѓР±РєР°	
+	set_bit(DDRD, 6); set_bit(DDRD, 7); // РЎРІРµС‚РѕРґРёРѕРґС‹
+	unset_bit(DDRA, 7); set_bit(PORTA, 7); // РЎС‡С‘С‚С‡РёРє РѕР±РѕСЂРѕС‚РѕРІ РґРёСЃРєР°
 
 	unset_bit(DDRF, 0); // ADC+
 	unset_bit(PORTF, 0);
@@ -385,7 +385,7 @@ int main (void)
 	{
 		if (is_LINE_POWER()) incoming_ring();
 		if (OFFHOOK) control_mode();
-		transfer_data(); // Передаём данные на досуге.
+		transfer_data(); // РџРµСЂРµРґР°С‘Рј РґР°РЅРЅС‹Рµ РЅР° РґРѕСЃСѓРіРµ.
 		//play_wav_auto("/00000007.wav");
 	}
 }

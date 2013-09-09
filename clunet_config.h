@@ -47,8 +47,7 @@
 #define CLUNET_DISABLE_TIMER_OVF unset_bit(TIMSK, TOIE2)
 
 // Инициализация внешнего прерывания и его включение
-#define CLUNET_INIT_INT {set_bit(EICRA,ISC10);unset_bit(EICRA,ISC11);}
-#define CLUNET_ENABLE_INT set_bit(EIMSK, INT1)
+#define CLUNET_INIT_INT {set_bit(EICRA,ISC10);unset_bit(EICRA,ISC11);set_bit(EIMSK, INT1);}
 
 // Векторы прерываний для таймера и внешнего прерывания
 #define CLUNET_TIMER_COMP_VECTOR TIMER2_COMP_vect
