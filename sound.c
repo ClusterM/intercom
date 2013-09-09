@@ -97,10 +97,10 @@ ISR(TIMER1_COMPA_vect)
 		value += -384+(RECORD_FIX);		
 		if (value < 0) value = 0;
 		if (value > 0xFF) value = 0xFF;		
-		//if (value >= 0x80-NOICE_LEVEL && value <= 0x80+NOICE_LEVEL) value = 0x80; // Íåáîëüøàÿ çàùèòà îò øóìîâ...
+		//if (value >= 0x80-NOICE_LEVEL && value <= 0x80+NOICE_LEVEL) value = 0x80; // ÐÐµÐ±Ð¾Ð»ÑŒÑˆÐ°Ñ Ð·Ð°Ñ‰Ð¸Ñ‚Ð° Ð¾Ñ‚ ÑˆÑƒÐ¼Ð¾Ð²...
 		*buff = value;
 		wi++;
-		OCR3C = value; // Âîñïðîèçâåäåíèå íà âñòðîåííûé äèíàìèê
+		OCR3C = value; // Ð’Ð¾ÑÐ¿Ñ€Ð¾Ð¸Ð·Ð²ÐµÐ´ÐµÐ½Ð¸Ðµ Ð½Ð° Ð²ÑÑ‚Ñ€Ð¾ÐµÐ½Ð½Ñ‹Ð¹ Ð´Ð¸Ð½Ð°Ð¼Ð¸Ðº
 		writePosition = wi & (sizeof(buffer) - 1);
 		bufferLeft++;
 		set_bit(ADCSRA, ADSC);
@@ -282,7 +282,7 @@ int init_wav_play()
 int play_wav(char* filename)
 {
 	sound_stop();
-	f_mount(0, &FATFS_Obj); // Ïåðåìîíòèðîâàíèå íà ñëó÷àé, åñëè SD êàðòà âûòàñêèâàëàñü
+	f_mount(0, &FATFS_Obj); // ÐŸÐµÑ€ÐµÐ¼Ð¾Ð½Ñ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð½Ð° ÑÐ»ÑƒÑ‡Ð°Ð¹, ÐµÑÐ»Ð¸ SD ÐºÐ°Ñ€Ñ‚Ð° Ð²Ñ‹Ñ‚Ð°ÑÐºÐ¸Ð²Ð°Ð»Ð°ÑÑŒ
 	if (f_open(&file, filename, FA_READ) != 0) return -1;
 	if (init_wav_play() < 0)
 	{
@@ -326,18 +326,18 @@ int play_wav_auto_pgm(char* filename)
 int init_wav_rec()
 {
 	recordedBytes = readPosition = 0; writePosition = 0; bufferLeft = 0;	/* Flush FIFO */
-	// Äëÿ âûâîäà íà âñòðîåííûé äèíàìèê òîãî, ÷òî ïèøåì
+	// Ð”Ð»Ñ Ð²Ñ‹Ð²Ð¾Ð´Ð° Ð½Ð° Ð²ÑÑ‚Ñ€Ð¾ÐµÐ½Ð½Ñ‹Ð¹ Ð´Ð¸Ð½Ð°Ð¼Ð¸Ðº Ñ‚Ð¾Ð³Ð¾, Ñ‡Ñ‚Ð¾ Ð¿Ð¸ÑˆÐµÐ¼
 	TCNT3 = 0;
 	TCCR3A = _BV(COM3C1) | _BV(WGM30);
 	TCCR3B = _BV(WGM32) | _BV(CS30);
 	OCR3C = 0x80;
 	DDRE |= _BV(5);	
 
-	// Ñíèìàåì íàïðÿæåíèå ñ íîãè âûâîäà çâóêà
+	// Ð¡Ð½Ð¸Ð¼Ð°ÐµÐ¼ Ð½Ð°Ð¿Ñ€ÑÐ¶ÐµÐ½Ð¸Ðµ Ñ Ð½Ð¾Ð³Ð¸ Ð²Ñ‹Ð²Ð¾Ð´Ð° Ð·Ð²ÑƒÐºÐ°
 	DDRE &= ~_BV(4);
 	PORTE &= ~_BV(4);
 	
-	// ADC1 - ïîçèòèâíûé, ADC0 - íåãàòèâíûé, óñèëåíèå 10x
+	// ADC1 - Ð¿Ð¾Ð·Ð¸Ñ‚Ð¸Ð²Ð½Ñ‹Ð¹, ADC0 - Ð½ÐµÐ³Ð°Ñ‚Ð¸Ð²Ð½Ñ‹Ð¹, ÑƒÑÐ¸Ð»ÐµÐ½Ð¸Ðµ 10x
 	unset_bit(ADCSRA, ADEN);
 	ADMUX = _BV(REFS0) | _BV(MUX3) | _BV(MUX0); /*| (1 << REFS1);*/ 
 	//ADCSRB = 0;
@@ -357,12 +357,12 @@ int init_wav_rec()
 
 int rec_wav(char* filename)
 {
-	// Çàãîëîâîê íà 8êÃö
+	// Ð—Ð°Ð³Ð¾Ð»Ð¾Ð²Ð¾Ðº Ð½Ð° 8ÐºÐ“Ñ†
 	BYTE header[] = {0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20,
 					  0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x40, 0x1F, 0x00, 0x00, 0x40, 0x1F, 0x00, 0x00,
 					  0x01, 0x00, 0x08, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00};
 /*	
-	// Çàãîëîâîê íà 16êÃö
+	// Ð—Ð°Ð³Ð¾Ð»Ð¾Ð²Ð¾Ðº Ð½Ð° 16ÐºÐ“Ñ†
 	BYTE header[] = {0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20,
 					  0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x80, 0x3E, 0x00, 0x00, 0x80, 0x3E, 0x00, 0x00,
 					  0x01, 0x00, 0x08, 0x00, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00};

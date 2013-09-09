@@ -8,53 +8,50 @@
  #ifndef __clunet_config_h_included__
 #define __clunet_config_h_included__
 
-// Адрес устройства (0-255)
+// РђРґСЂРµСЃ СѓСЃС‚СЂРѕР№СЃС‚РІР° (0-255)
 #define CLUNET_DEVICE_ID 7
 
-// Имя устройства
+// РРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
 #define CLUNET_DEVICE_NAME "Intercom"
 
-// Размер буфера для чтения и передачи (сколько оперативки сожрать)
+// Р Р°Р·РјРµСЂ Р±СѓС„РµСЂР° РґР»СЏ С‡С‚РµРЅРёСЏ Рё РїРµСЂРµРґР°С‡Рё (СЃРєРѕР»СЊРєРѕ РѕРїРµСЂР°С‚РёРІРєРё СЃРѕР¶СЂР°С‚СЊ)
 #define CLUNET_SEND_BUFFER_SIZE 128
 #define CLUNET_READ_BUFFER_SIZE 128
 
-// Порт и нога для отправки данных
+// РџРѕСЂС‚ Рё РЅРѕРіР° РґР»СЏ РѕС‚РїСЂР°РІРєРё РґР°РЅРЅС‹С…
 #define CLUNET_WRITE_PORT D
 #define CLUNET_WRITE_PIN 0
 
-// Определить, если линия прижимается к земле транзистором
+// РћРїСЂРµРґРµР»РёС‚СЊ, РµСЃР»Рё Р»РёРЅРёСЏ РїСЂРёР¶РёРјР°РµС‚СЃСЏ Рє Р·РµРјР»Рµ С‚СЂР°РЅР·РёСЃС‚РѕСЂРѕРј
 #define CLUNET_WRITE_TRANSISTOR
 
-// Порт и нога для чтения данных, должна иметь внешнеее прерывание
+// РџРѕСЂС‚ Рё РЅРѕРіР° РґР»СЏ С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С…, РґРѕР»Р¶РЅР° РёРјРµС‚СЊ РІРЅРµС€РЅРµРµРµ РїСЂРµСЂС‹РІР°РЅРёРµ
 #define CLUNET_READ_PORT D
 #define CLUNET_READ_PIN 1
 
-// Предделитель таймера
+// РџСЂРµРґРґРµР»РёС‚РµР»СЊ С‚Р°Р№РјРµСЂР°
 #define CLUNET_TIMER_PRESCALER 64
 
-// Инициализация таймера
-#define CLUNET_TIMER_INIT {unset_bit4(TCCR2, WGM21, WGM20, COM21, COM20); /* Timer2, нормальный режим */ \
-	unset_bit(TCCR2, CS22); set_bit2(TCCR2, CS21, CS20); /* 64x предделитель */ }
+// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚Р°Р№РјРµСЂР°
+#define CLUNET_TIMER_INIT {unset_bit4(TCCR2, WGM21, WGM20, COM21, COM20); /* Timer2, РЅРѕСЂРјР°Р»СЊРЅС‹Р№ СЂРµР¶РёРј */ \
+	unset_bit(TCCR2, CS22); set_bit2(TCCR2, CS21, CS20); /* 64x РїСЂРµРґРґРµР»РёС‚РµР»СЊ */ }
 
-// Регистр самого таймера и компарера
+// Р РµРіРёСЃС‚СЂ СЃР°РјРѕРіРѕ С‚Р°Р№РјРµСЂР° Рё РєРѕРјРїР°СЂРµСЂР°
 #define CLUNET_TIMER_REG TCNT2
 #define CLUNET_TIMER_REG_OCR OCR2
 
-// Включение/выключение прерываний таймера
+// Р’РєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ РїСЂРµСЂС‹РІР°РЅРёР№ С‚Р°Р№РјРµСЂР°
 #define CLUNET_ENABLE_TIMER_COMP set_bit(TIMSK, OCIE2)
 #define CLUNET_DISABLE_TIMER_COMP unset_bit(TIMSK, OCIE2)
 #define CLUNET_ENABLE_TIMER_OVF set_bit(TIMSK, TOIE2)
 #define CLUNET_DISABLE_TIMER_OVF unset_bit(TIMSK, TOIE2)
 
-// Инициализация внешнего прерывания и его включение
+// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІРЅРµС€РЅРµРіРѕ РїСЂРµСЂС‹РІР°РЅРёСЏ Рё РµРіРѕ РІРєР»СЋС‡РµРЅРёРµ
 #define CLUNET_INIT_INT {set_bit(EICRA,ISC10);unset_bit(EICRA,ISC11);set_bit(EIMSK, INT1);}
 
-// Векторы прерываний для таймера и внешнего прерывания
+// Р’РµРєС‚РѕСЂС‹ РїСЂРµСЂС‹РІР°РЅРёР№ РґР»СЏ С‚Р°Р№РјРµСЂР° Рё РІРЅРµС€РЅРµРіРѕ РїСЂРµСЂС‹РІР°РЅРёСЏ
 #define CLUNET_TIMER_COMP_VECTOR TIMER2_COMP_vect
 #define CLUNET_TIMER_OVF_VECTOR TIMER2_OVF_vect
 #define CLUNET_INT_VECTOR INT1_vect
-
-// Добавляет код для обновления загрузчика
-//#define CLUNET_ENABLE_BOOT_UPDATE
 
 #endif
