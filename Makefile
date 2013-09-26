@@ -7,7 +7,7 @@ CLUNET_DEVICE_ID = 7
 #MCU_PROGRAMMER = m8
 
 CLUNET_PATH		 = ../clunet
-CLUNET_FLASHER = D:/Soft/Soft/clunetflasher/clunetflasher.exe
+CLUNET_FLASHER = D:/Soft/Soft/ClunetFlasher/clunetflasher.exe
 CLUNET_IP      = 10.13.0.254
 CLUNET_PORT    = 10009
 
@@ -88,8 +88,8 @@ clunet.o:
 $(PRG).elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-# dependency:
-demo.o: demo.c
+clunet.o:
+	$(CC) $(CFLAGS) -c -o $@ $^ $(CLUNET_PATH)/clunet.c
 
 clean:
 	rm -rf *.o $(PRG).elf *.eps *.png *.pdf *.bak 
