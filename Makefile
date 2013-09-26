@@ -1,5 +1,5 @@
 PRG            = intercom
-OBJ            = intercom.o ff.o diskio.o rtc.o sound.o transfer.o clunet.o
+OBJ            = intercom.o ff.o diskio.o rtc.o clunet.o sound.o transfer.o
 CLUNET_DEVICE_ID = 7
 #LFUSE          = E4
 #LFUSE          = FF
