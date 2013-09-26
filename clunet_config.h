@@ -16,7 +16,7 @@
 
 // Размер буфера для чтения и передачи (сколько оперативки сожрать)
 #define CLUNET_SEND_BUFFER_SIZE 128
-#define CLUNET_READ_BUFFER_SIZE 128
+#define CLUNET_READ_BUFFER_SIZE 16
 
 // Порт и нога для отправки данных
 #define CLUNET_WRITE_PORT D
