@@ -83,13 +83,10 @@ OBJDUMP        = avr-objdump
 all: $(PRG).elf lst text eeprom
 
 clunet.o:
-	$(CC) $(CFLAGS) -c -o $@ $^ $(CLUNET_PATH)/clunet.c
+	$(CC) $(CFLAGS) -c -o $@ $(CLUNET_PATH)/clunet.c
 
 $(PRG).elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
-
-clunet.o:
-	$(CC) $(CFLAGS) -c -o $@ $^ $(CLUNET_PATH)/clunet.c
 
 clean:
 	rm -rf *.o $(PRG).elf *.eps *.png *.pdf *.bak 
