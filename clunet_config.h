@@ -5,7 +5,7 @@
  * License: DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
  */
  
- #ifndef __clunet_config_h_included__
+#ifndef __clunet_config_h_included__
 #define __clunet_config_h_included__
 
 // Адрес устройства (0-255)

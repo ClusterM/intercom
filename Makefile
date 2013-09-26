@@ -1,15 +1,15 @@
 PRG            = intercom
-OBJ            = intercom.o ff.o diskio.o rtc.o clunet.o sound.o transfer.o
+OBJ            = intercom.o ff.o diskio.o rtc.o sound.o transfer.o clunet.o
+CLUNET_DEVICE_ID = 7
 #LFUSE          = E4
 #LFUSE          = FF
 #HFUSE          = D9
 #MCU_PROGRAMMER = m8
 
-CLUNET_FLASHER = D:/Soft/Soft/ClunetFlasher/clunetflasher.exe
-//CLUNET_IP      = 127.0.0.1
+CLUNET_PATH		 = ../clunet
+CLUNET_FLASHER = D:/Soft/Soft/clunetflasher/clunetflasher.exe
 CLUNET_IP      = 10.13.0.254
 CLUNET_PORT    = 10009
-CLUNET_DEVICE_ID = 7
 
 #MCU_TARGET     = at90s2313
 #MCU_TARGET     = at90s2333
@@ -44,7 +44,7 @@ MCU_TARGET     = atmega64
 #MCU_TARGET     = atmega6450
 #MCU_TARGET     = atmega649
 #MCU_TARGET     = atmega6490
-#MCU_TARGET     = atmega16
+#MCU_TARGET     = atmega8
 #MCU_TARGET     = atmega8515
 #MCU_TARGET     = atmega8535
 #MCU_TARGET     = atmega88
@@ -62,7 +62,11 @@ MCU_TARGET     = atmega64
 OPTIMIZE       = -O2
 
 DEFS           =
-LIBS           =
+LIBS           = 
+
+program: hex
+	$(CLUNET_FLASHER) $(CLUNET_IP) $(CLUNET_PORT) $(CLUNET_DEVICE_ID) $(PRG).hex
+#	avrdude -V -p $(MCU_PROGRAMMER) -c avrisp2 -P usb -U flash:w:$(PRG).hex -U lfuse:w:0x$(LFUSE):m -U hfuse:w:0x$(HFUSE):m
 
 # You should not have to change anything below here.
 
@@ -70,13 +74,16 @@ CC             = avr-gcc
 
 # Override is only needed by avr-lib build system.
 
-override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS)
+override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) $(DEFS) -I. -I$(CLUNET_PATH)
 override LDFLAGS       = -Wl,-Map,$(PRG).map
 
 OBJCOPY        = avr-objcopy
 OBJDUMP        = avr-objdump
 
 all: $(PRG).elf lst text eeprom
+
+clunet.o:
+	$(CC) $(CFLAGS) -c -o $@ $^ $(CLUNET_PATH)/clunet.c
 
 $(PRG).elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
@@ -150,8 +157,3 @@ pdf: $(PRG).pdf
 
 %.png: %.fig
 	$(FIG2DEV) -L png $< $@
-
-program: hex
-	$(CLUNET_FLASHER) $(CLUNET_IP) $(CLUNET_PORT) $(CLUNET_DEVICE_ID) $(PRG).hex
-#	avrdude -V -p $(MCU_PROGRAMMER) -c avrisp2 -P usb -U flash:w:$(PRG).hex -U lfuse:w:0x$(LFUSE):m -U hfuse:w:0x$(HFUSE):m
-
