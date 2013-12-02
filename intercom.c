@@ -128,6 +128,15 @@ int answer_play_open(char* filename) // Отвечает, воспроизвод
 	return 0;
 }
 
+int answer_open_play(char* filename) // Отвечает, открывает дверь и воспроизводит файл
+{
+	ANSWER;
+	OPEN;
+	_delay_ms(1000);
+	if (answer_play(filename)) return 1; // Сняли трубку, или сигнал исчез
+	return 0;
+}
+
 
 int answer_record(char* filename1, char* filename2) // Отвечает, записывает сообщение,
 {
@@ -174,7 +183,8 @@ void incoming_ring() // Выполняется при любом входяще�
 	unsigned char mode = (mode_temp != 0) ? mode_temp : mode_current; // Текущий режим
 	// Сообщение о звонке, указываем текущий режим
 	clunet_send(CLUNET_BROADCAST_ADDRESS, CLUNET_PRIORITY_INFO, CLUNET_COMMAND_INTERCOM_RING, (char*)&mode, 1);
-	intercom_bell();
+	if (mode != 3 && mode != 0xFF) 
+		intercom_bell();
 	if (mode_temp) // Обнуляем временный режим
 	{
 		mode_temp = 0;
@@ -196,7 +206,7 @@ void incoming_ring() // Выполняется при любом входяще�
 				answer_record(AUTOFAST_WAV, SAVED_WAV);
 				break;
 			case 3: // Приветствует хозяина, открывает дверь
-				answer_play_open(OPENME_WAV);
+				answer_open_play(OPENME_WAV);
 				break;
 			case 4: // Приветствует гостя, открывает дверь
 				answer_play_open(OPEN_WAV);
@@ -205,7 +215,7 @@ void incoming_ring() // Выполняется при любом входяще�
 				answer_play(WAITLONG_WAV);
 				break;
 			case 9: // Здрасти, здрастите. Проходи, братишка, проходи.
-				answer_play_open(MODE9_WAV);
+				answer_open_play(MODE9_WAV);
 				break;				
 			case 0xFF:  // Аварийное откртие двери
 				answer_play_open(EMERGENCY_OPEN_WAV);
