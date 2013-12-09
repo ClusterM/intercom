@@ -206,7 +206,7 @@ void incoming_ring() // Выполняется при любом входяще�
 				answer_record(AUTOFAST_WAV, SAVED_WAV);
 				break;
 			case 3: // Приветствует хозяина, открывает дверь
-				answer_open_play(OPENME_WAV);
+				answer_play_open(OPENME_WAV);
 				break;
 			case 4: // Приветствует гостя, открывает дверь
 				answer_play_open(OPEN_WAV);
@@ -215,7 +215,7 @@ void incoming_ring() // Выполняется при любом входяще�
 				answer_play(WAITLONG_WAV);
 				break;
 			case 9: // Здрасти, здрастите. Проходи, братишка, проходи.
-				answer_open_play(MODE9_WAV);
+				answer_play_open(MODE9_WAV);
 				break;				
 			case 0xFF:  // Аварийное откртие двери
 				answer_play_open(EMERGENCY_OPEN_WAV);
