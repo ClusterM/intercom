@@ -185,6 +185,7 @@ void incoming_ring() // Выполняется при любом входяще�
 	clunet_send(CLUNET_BROADCAST_ADDRESS, CLUNET_PRIORITY_INFO, CLUNET_COMMAND_INTERCOM_RING, (char*)&mode, 1);
 	if (mode != 3 && mode != 0xFF) 
 		intercom_bell();
+		else _delay_ms(500);
 	if (mode_temp) // Обнуляем временный режим
 	{
 		mode_temp = 0;
