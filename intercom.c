@@ -19,9 +19,10 @@ volatile unsigned long int record_num = 0;
 char buffer[32];
 
 char STARTED_WAV[] PROGMEM = "/system/started.wav";
-char AUTOLONG_WAV[] PROGMEM = "/system/automid.wav";
+char AUTOLONG_WAV[] PROGMEM = "/system/autofake.wav";
 char AUTOFAST_WAV[] PROGMEM = "/system/autofast.wav";
 char SAVED_WAV[] PROGMEM = "/system/saved.wav";
+char SAVED_FAKE_WAV[] PROGMEM = "/system/savefake.wav";
 char OPENME_WAV[] PROGMEM = "/system/openme.wav";
 char OPEN_WAV[] PROGMEM = "/system/open.wav";
 char WAITLONG_WAV[] PROGMEM = "/system/waitlong.wav";
@@ -57,7 +58,7 @@ void data_received(unsigned char src_address, unsigned char dst_address, unsigne
 {
 	if (command == CLUNET_COMMAND_TIME && size >= 6) // Синхронизация времени
 	{
-		set_time(data[3]+2000, data[4], data[5], data[0],data[1],data[2]);
+		set_time(data[3]+1900, data[4], data[5], data[0],data[1],data[2]);
 	}
 	else if (command == CLUNET_COMMAND_INTERCOM_MODE_REQUEST) // У нас запрашивают режим
 	{
@@ -137,11 +138,10 @@ int answer_open_play(char* filename) // Отвечает, открывает д�
 	return 0;
 }
 
-
-int answer_record(char* filename1, char* filename2) // Отвечает, записывает сообщение,
+int answer_record(char* filename1, char* filename2, char use_beep) // Отвечает, записывает сообщение,
 {
 	if (answer_play(filename1)) return 1; // Отвечаем, предлагаем оставить сообщение
-	beep(3000, 500);	// Биип
+	if (use_beep) beep(3000, 500);	// Биип
 	sprintf(buffer, "/%08lu.wav", record_num); // Формируем имя файла
 	clunet_send(CLUNET_BROADCAST_ADDRESS, CLUNET_PRIORITY_INFO, CLUNET_COMMAND_INTERCOM_MESSAGE, (char*)&record_num, sizeof(record_num)); // Отправляем в сеть сообщение
 	record_num++;
@@ -201,10 +201,10 @@ void incoming_ring() // Выполняется при любом входяще�
 		switch (mode)
 		{
 			case 1: // Автоответчик, долго ждёт ответа, потом записывает
-				answer_record(AUTOLONG_WAV, SAVED_WAV);
+				answer_record(AUTOLONG_WAV, SAVED_FAKE_WAV, 0);
 				break;
 			case 2: // Автоответчик, сразу записывает
-				answer_record(AUTOFAST_WAV, SAVED_WAV);
+				answer_record(AUTOFAST_WAV, SAVED_WAV, 1);
 				break;
 			case 3: // Приветствует хозяина, открывает дверь
 				answer_play_open(OPENME_WAV);
@@ -397,7 +397,6 @@ int main (void)
 		if (is_LINE_POWER()) incoming_ring();
 		if (OFFHOOK) control_mode();
 		transfer_data(); // Передаём данные на досуге.
-		//play_wav_auto("/00000007.wav");
 	}
 }
 
