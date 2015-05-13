@@ -19,6 +19,7 @@ volatile unsigned long int record_num = 0;
 char buffer[32];
 
 char STARTED_WAV[] PROGMEM = "/system/started.wav";
+char TEST_WAV[] PROGMEM = "/system/test.wav";
 char AUTOLONG_WAV[] PROGMEM = "/system/autofake.wav";
 char AUTOFAST_WAV[] PROGMEM = "/system/autofast.wav";
 char SAVED_WAV[] PROGMEM = "/system/saved.wav";
@@ -360,7 +361,8 @@ int main (void)
 	disk_initialize(0);	
 
 	unset_bit(DDRA, 3); set_bit(PORTA, 3);	 // Определение сигнала в линии	
-	unset_bit(DDRA, 4);	unset_bit(PORTA, 4); // Открывалка двери
+	//unset_bit(DDRA, 4);	unset_bit(PORTA, 4); // Открывалка двери, напрямую
+	set_bit(DDRA, 4);	unset_bit(PORTA, 4); // Открывалка двери, через реле
 	set_bit(DDRA, 5); HANGUP; // Реле снимания трубки
 	set_bit(DDRA, 6); MODE_NORMAL; // Реле выбора режима
 	unset_bit(DDRG, 0); set_bit(PORTG, 0); // Определение, лежит ли трубка	
@@ -399,4 +401,5 @@ int main (void)
 		transfer_data(); // Передаём данные на досуге.
 	}
 }
+
 
